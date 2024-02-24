@@ -1,7 +1,7 @@
 <template>
 <div>
     <h1>Laravel</h1>
-    <p>Test page</p>
+    <a href="http://localhost/laravel-test/public/create">Create Product</a>
 </div>
 </template>
 
