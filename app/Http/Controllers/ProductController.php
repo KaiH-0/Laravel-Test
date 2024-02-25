@@ -32,7 +32,21 @@ class ProductController extends Controller
      */
     public function store(StoreProductRequest $request)
     {
-        $product = Product::create($request->all());
+
+        if ($request->hasFile('image')) {
+            $image = $request->file('image');
+            $imageName = $image->getClientOriginalName(); // Get original file name
+            $image->storeAs('public/images/products/', $imageName); // Store image
+            $imageurl = url('storage/images/products/' . $imageName); // Set image URL
+            //$image->move('storage/images/products/', $imageName);
+        }
+        $product = Product::create([
+            'name'=> $request->name,
+            'description'=> $request->description,
+            'price'=> $request->price,
+            'quantity'=> $request->quantity,
+            'image'=> $imageurl,
+        ]);
         $product->categories()->attach($request->input('categories')); // Attach selected categories
         return response()->json($product);
     }

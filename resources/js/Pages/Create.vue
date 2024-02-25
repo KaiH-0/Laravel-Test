@@ -1,32 +1,48 @@
 <template>
-    <h1>Create Product</h1>
-  <form @submit.prevent="submitForm">
-    <div>
-        <label for="name">Name:</label>
-        <input type="text" v-model="name" name="name" id="name" value="" required>
+<form @submit.prevent="submitForm" class="pt-6 pb-8 mb-4" enctype="multipart/form-data">
+    <div class="mb-4">
+      <label class="block text-gray-700 text-sm font-bold mb-2" for="name">
+        Name
+      </label>
+      <input class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" v-model="name" id="name" type="text" placeholder="Name">
     </div>
-
-    <div>
-        <label for="description">Description:</label>
-        <textarea name="description" v-model="description" id="description"></textarea>
+    <div class="mb-4">
+      <label class="block text-gray-700 text-sm font-bold mb-2" for="description">
+        Description
+      </label>
+      <input class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" v-model="description" id="description" type="text" placeholder="Description">
     </div>
-
-    <div>
-        <label for="price">Price:</label>
-        <input type="number" v-model="price" name="price" id="price" value="" step="0.01" required>
+    <div class="mb-4">
+      <label class="block text-gray-700 text-sm font-bold mb-2" for="price">
+        Price
+      </label>
+      <input class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" v-model="price" id="price" type="number" placeholder="Price">
     </div>
-
-    <div>
-        <label for="quantity">Quantity:</label>
-        <input type="number" v-model="quantity" name="quantity" id="quantity" value="1" required>
+    <div class="mb-4">
+      <label class="block text-gray-700 text-sm font-bold mb-2" for="quantity">
+        Quantity
+      </label>
+      <input class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" v-model="quantity" id="quantity" type="number" placeholder="Quantity">
     </div>
-    <div>
-        <label for="selectedCategories">Category:</label>
-        <select multiple v-model="selectedCategories">
-                <option v-for="category in categories" :key="category.id" :value="category.id">{{ category.name }}</option>
-            </select>
+    <div class="mb-4">
+      <label class="block text-gray-700 text-sm font-bold mb-2" for="name">
+        Categories
+      </label>
+      <select multiple v-model="selectedCategories" class="block appearance-none w-full bg-white border border-gray-400 hover:border-gray-500 px-4 py-2 pr-8 rounded shadow leading-tight focus:outline-none focus:shadow-outline">
+        <option v-for="category in categories" :key="category.id" :value="category.id">{{ category.name }}</option>
+  </select>
     </div>
-    <button type="submit">Create</button>
+    <div class="mb-4">
+      <label class="block text-gray-700 text-sm font-bold mb-2" for="name">
+        Image
+      </label>
+      <input type="file" id="image" @change="onFileChange" accept="image/*">
+  </div>
+    <div class="flex items-center justify-center">
+      <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
+        Create
+      </button>
+    </div>
   </form>
 </template>
 
@@ -41,7 +57,8 @@ export default {
         price: '',
         quantity: '',
         categories: [],
-        selectedCategories: []
+        selectedCategories: [],
+        image: null,
     };
   },
   mounted() {
@@ -49,6 +66,10 @@ export default {
     this.fetchCategories();
   },
   methods: {
+    onFileChange(event) {
+      this.image = event.target.files[0];
+      console.log(event.target.files[0]);
+    },
     fetchCategories() {
       // Make an HTTP request to fetch categories from backend
       axios.get('categories')
@@ -66,9 +87,14 @@ export default {
         price: this.price,
         quantity: this.quantity,
         category_id: this.category_id,
+        image: this.image,
       };
       productData.categories = this.selectedCategories;
-      axios.post('submit-form', productData)
+      axios.post('submit-form', productData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      })
       .then(response => {
           console.log('Product added successfully:', response.data);
 
@@ -77,6 +103,7 @@ export default {
           this.price = '';
           this.quantity = '';
           this.selectedCategories = [];
+          this.image = null;
           // Optionally, you can redirect the user or show a success message
         })
         .catch(error => {
