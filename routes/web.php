@@ -1,9 +1,13 @@
 <?php
 
 use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\HomeController;
+use App\Http\Controllers\ProductController;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
-use App\Http\Controllers\ProductController;
+
+
 
 /*
 |--------------------------------------------------------------------------
@@ -18,15 +22,27 @@ use App\Http\Controllers\ProductController;
 
 Route::get('/', function () {
     return Inertia::render('Home');
-});
-
-Route::get('/create', function () {
-    return Inertia::render('Create');
-});
+})->name('home');
 
 Route::resource('products', 'ProductController');
 
 Route::post('/submit-form', [ProductController::class, 'store']);
 
+Route::get('/products', [ProductController::class, 'index']);
+
 Route::get('/categories', [CategoryController::class, 'index']);
+
+Route::group(['middleware' => ['auth','isAdmin']], function () {
+
+    Route::get('/create', function () {
+        return Inertia::render('Create');
+    })->name('create');
+ 
+ });
+
+ Route::get('/logout', '\App\Http\Controllers\Auth\LoginController@logout')->name('logout');
+
 //Route::post('/submit-form', 'ProductController@store');
+Auth::routes();
+
+//Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
